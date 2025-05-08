@@ -10,12 +10,18 @@ import {
   FileText,
   Layers,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // ✅ Add this
+import { useNavigate } from "react-router-dom";
 import AdminBeta from "../components/Client/Adminbeta";
 
 const AdminDashboard = () => {
   const [showBeta, setShowBeta] = useState(false);
-  const navigate = useNavigate(); // ✅ Initialize navigate
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/"); // Redirect to home page
+  };
 
   return (
     <div className="min-h-screen flex bg-gray-100 text-gray-900">
@@ -31,25 +37,29 @@ const AdminDashboard = () => {
           <SidebarItem
             icon={<Users size={18} />}
             label="Users"
-            onClick={() => navigate("/adminusers")} 
+            onClick={() => navigate("/adminusers")}
           />
           <SidebarItem
             icon={<FileText size={18} />}
             label="Manage Request"
-            onClick={() => navigate("/adminmanagerequest")} // Updated to navigate to /adminmanagerequest
+            onClick={() => navigate("/adminmanagerequest")}
           />
           <SidebarItem icon={<DollarSign size={18} />} label="Payments" />
           <SidebarItem
             icon={<Layers size={18} />}
             label="Manage Jobs"
-            onClick={() => navigate("/adminjobs")} // Navigate to /adminjobs
+            onClick={() => navigate("/adminjobs")}
           />
-               <SidebarItem
-                  icon={<Settings size={18} />}
-                  label="Settings"
-                  onClick={() => navigate("/adminsettings")} // Navigate to admin settings
-                />
-          <SidebarItem icon={<LogOut size={18} />} label="Logout" />
+          <SidebarItem
+            icon={<Settings size={18} />}
+            label="Settings"
+            onClick={() => navigate("/adminsettings")}
+          />
+          <SidebarItem
+            icon={<LogOut size={18} />}
+            label="Logout"
+            onClick={handleLogout}
+          />
         </nav>
       </aside>
 
@@ -66,15 +76,27 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Widget
             title="Total Users"
             value="2,430"
-            customClass="text-green-600 text-xl font-bold" // Added custom class
+            customClass="text-green-600 text-xl font-bold"
           />
-          <Widget title="Monthly Revenue" value="$12,340" customClass="text-green-600 text-xl font-bold"/>
-          <Widget title="Reports" value="34" customClass="text-green-600 text-xl font-bold"/>
-          <Widget title="Projects" value="128" customClass="text-green-600 text-xl font-bold"/>
+          <Widget
+            title="Monthly Revenue"
+            value="$12,340"
+            customClass="text-green-600 text-xl font-bold"
+          />
+          <Widget
+            title="Reports"
+            value="34"
+            customClass="text-green-600 text-xl font-bold"
+          />
+          <Widget
+            title="Projects"
+            value="128"
+            customClass="text-green-600 text-xl font-bold"
+          />
         </section>
 
         <section className="mt-8">
@@ -115,7 +137,9 @@ function SidebarItem({ icon, label, to, onClick }) {
 function Widget({ title, value, customClass }) {
   return (
     <div className="bg-white p-4 rounded shadow">
-      <h3 className={`text-sm font-medium text-gray-600 ${customClass || ''}`}>{title}</h3>
+      <h3 className={`text-sm font-medium text-gray-600 ${customClass || ''}`}>
+        {title}
+      </h3>
       <p className="text-xl font-semibold mt-2">{value}</p>
     </div>
   );

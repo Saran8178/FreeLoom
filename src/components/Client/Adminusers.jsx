@@ -9,7 +9,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import AdminBeta from "../Client/Adminbeta"; // Make sure the path is correct
+import AdminBeta from "../Client/Adminbeta"; // Ensure the path is correct
 
 export default function Adminusers() {
   const [users, setUsers] = useState([]);
@@ -17,18 +17,31 @@ export default function Adminusers() {
   const [showBeta, setShowBeta] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setTimeout(() => {
-      const mockUsers = [
-        { id: 1, name: "Alice", email: "alice@example.com", role: "User" },
-        { id: 2, name: "Bob", email: "bob@example.com", role: "Admin" },
-        { id: 3, name: "Charlie", email: "charlie@example.com", role: "User" },
-      ];
-      setUsers(mockUsers);
-      setLoading(false);
-    }, 500);
-  }, []);
+  const token = localStorage.getItem("token");
+console.log("Token from localStorage:", token); // Log the token
 
+fetch("http://localhost:8080/api/recruiter/users", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+})
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Failed to fetch users");
+    }
+    return response.json();
+  })
+  .then((data) => {
+    setUsers(data);
+    setLoading(false);
+  })
+  .catch((error) => {
+    console.error("Error fetching users:", error);
+    setLoading(false);
+  });
+ 
   if (loading) return <div className="p-4">Loading users...</div>;
 
   return (
@@ -47,23 +60,22 @@ export default function Adminusers() {
             label="Users"
             onClick={() => navigate("/adminusers")}
           />
-           <SidebarItem
-                      icon={<FileText size={18} />}
-                      label="Manage Request"
-                      onClick={() => navigate("/adminmanagerequest")}
-                    />
-          <SidebarItem icon={<DollarSign size={18} />} label="Payments" />
-           <SidebarItem
-                      icon={<Layers size={18} />}
-                      label="Manage Jobs"
-                      onClick={() => navigate("/adminjobs")} // Navigate to /adminjobs
-                    />
           <SidebarItem
-  icon={<Settings size={18} />}
-  label="Settings"
-  onClick={() => navigate("/adminsettings")} // Navigate to admin settings
-/>
-
+            icon={<FileText size={18} />}
+            label="Manage Request"
+            onClick={() => navigate("/adminmanagerequest")}
+          />
+          <SidebarItem icon={<DollarSign size={18} />} label="Payments" />
+          <SidebarItem
+            icon={<Layers size={18} />}
+            label="Manage Jobs"
+            onClick={() => navigate("/adminjobs")}
+          />
+          <SidebarItem
+            icon={<Settings size={18} />}
+            label="Settings"
+            onClick={() => navigate("/adminsettings")}
+          />
           <SidebarItem icon={<LogOut size={18} />} label="Logout" />
         </nav>
       </aside>

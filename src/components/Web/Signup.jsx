@@ -1,7 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 
 const Signup = ({ isOpen, onClose, openAdminSignup }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   if (!isOpen) return null; // Don't render if modal is closed
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    const newUser = { name, email, password };
+
+    try {
+      const response = await axios.post('http://localhost:8080/auth/signup', newUser);
+      console.log('Signup successful:', response.data);
+      // After successful signup, you can optionally redirect or display a success message
+    } catch (error) {
+      console.error('Signup failed:', error.response?.data || error.message);
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -22,8 +41,7 @@ const Signup = ({ isOpen, onClose, openAdminSignup }) => {
           {/* Close Button */}
           <button onClick={onClose} className="absolute top-2 right-2 text-lg font-bold text-gray-600">X</button>
 
-          <form className="space-y-6">
-            {/* Form Fields */}
+          <form className="space-y-6" onSubmit={handleSignup}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
               <input
@@ -31,6 +49,8 @@ const Signup = ({ isOpen, onClose, openAdminSignup }) => {
                 id="name"
                 className="mt-1 w-full p-3 border border-gray-300 rounded-md shadow-sm bg-[whitesmoke] focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 
@@ -41,6 +61,8 @@ const Signup = ({ isOpen, onClose, openAdminSignup }) => {
                 id="email"
                 className="mt-1 w-full p-3 border border-gray-300 rounded-md shadow-sm bg-[whitesmoke] focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -51,6 +73,8 @@ const Signup = ({ isOpen, onClose, openAdminSignup }) => {
                 id="password"
                 className="mt-1 w-full p-3 border border-gray-300 rounded-md shadow-sm bg-[whitesmoke] focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
@@ -59,7 +83,7 @@ const Signup = ({ isOpen, onClose, openAdminSignup }) => {
             </button>
 
             <p className="text-sm text-center text-gray-600 mt-4">
-              Already have an account ? <a href="#!" onClick={openAdminSignup} className="text-green-600 font-medium hover:underline">Login</a>
+              Already have an account? <a href="#!" onClick={openAdminSignup} className="text-green-600 font-medium hover:underline">Login</a>
             </p>
           </form>
         </div>

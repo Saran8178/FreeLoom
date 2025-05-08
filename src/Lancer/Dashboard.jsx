@@ -30,6 +30,11 @@ export default function Dashboard() {
   const [showBriefcase, setShowBriefcase] = useState(false);
   const navigate = useNavigate(); // ✅ For routing
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/"); // Redirect to homepage
+  };
   return (
     <div className="min-h-screen bg-white">
       {showBriefcase && <BriefcaseBeta onClose={() => setShowBriefcase(false)} />}
@@ -110,11 +115,12 @@ export default function Dashboard() {
               <Users size={16} /> Manage Client
             </button>
             <button
-              className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2"
-              onClick={() => navigate("/logout")} // Optional route for logout
-            >
-              <LogOut size={16} /> Logout
-            </button>
+  className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2"
+  onClick={handleLogout}
+>
+  <LogOut size={16} /> Logout
+</button>
+ 
           </div>
 
           {/* Video Cards */}
