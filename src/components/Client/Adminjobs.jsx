@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart2, Users, FileText, DollarSign, Layers, Settings, LogOut } from 'lucide-react'; // Import necessary icons
+import { BarChart2, Users, FileText, DollarSign, Layers, Settings, LogOut } from 'lucide-react';
 
 const AdminJobs = () => {
-  // State for form input fields
   const [jobForm, setJobForm] = useState({
     jobTitle: '',
     company: '',
@@ -11,7 +10,6 @@ const AdminJobs = () => {
     clientName: '',
   });
 
-  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setJobForm({
@@ -20,25 +18,60 @@ const AdminJobs = () => {
     });
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Logic to add the job (for now, we log the job data to the console)
-    console.log('Job Added:', jobForm);
-    // Reset the form after submission
-    setJobForm({
-      jobTitle: '',
-      company: '',
-      description: '',
-      clientName: '',
-    });
+
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    const userId = localStorage.getItem("userId");
+
+    if (role !== "RECRUITER") {
+      alert("Only recruiters can add jobs.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/recruiter/jobs/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: jobForm.jobTitle,
+          description: jobForm.description,
+          clientName: jobForm.clientName,
+          recruiterId: userId
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Job Added:", result);
+        alert("Job successfully added");
+
+        // Reset the form
+        setJobForm({
+          jobTitle: '',
+          company: '',
+          description: '',
+          clientName: '',
+        });
+      } else {
+        const err = await response.text();
+        console.error("Failed to add job:", err);
+        alert("Failed to add job");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while adding the job.");
+    }
   };
 
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex bg-gray-100 text-black">
-      {/* Sidebar */}
       <aside className="w-64 bg-gray-200 shadow-md p-4">
         <div className="text-2xl font-bold mb-6">AdminPanel</div>
         <nav className="space-y-2">
@@ -50,7 +83,7 @@ const AdminJobs = () => {
           <SidebarItem
             icon={<Users size={18} />}
             label="Users"
-            onClick={() => navigate("/adminusers")} 
+            onClick={() => navigate("/adminusers")}
           />
           <SidebarItem
             icon={<FileText size={18} />}
@@ -59,20 +92,18 @@ const AdminJobs = () => {
           />
           <SidebarItem icon={<DollarSign size={18} />} label="Payments" />
           <SidebarItem icon={<Layers size={18} />} label="Manage Jobs" />
-                <SidebarItem
-                   icon={<Settings size={18} />}
-                   label="Settings"
-                   onClick={() => navigate("/adminsettings")} // Navigate to admin settings
-                 />
+          <SidebarItem
+            icon={<Settings size={18} />}
+            label="Settings"
+            onClick={() => navigate("/adminsettings")}
+          />
           <SidebarItem icon={<LogOut size={18} />} label="Logout" />
         </nav>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 p-6">
         <h1 className="text-3xl font-semibold mb-6">Add New Job</h1>
 
-        {/* Job Form */}
         <div className="bg-gray-100 p-6 mb-4 rounded-lg shadow-md">
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
@@ -123,7 +154,6 @@ const AdminJobs = () => {
               />
             </div>
 
-            {/* Add Button */}
             <button
               type="submit"
               className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-500"
@@ -137,17 +167,10 @@ const AdminJobs = () => {
   );
 };
 
-// Sidebar item component
 function SidebarItem({ icon, label, onClick }) {
-  const handleClick = () => {
-    if (onClick) {
-      onClick();
-    }
-  };
-
   return (
     <button
-      onClick={handleClick}
+      onClick={onClick}
       className="w-full flex items-center gap-3 px-4 py-2 bg-white rounded hover:bg-gray-300 text-left shadow-sm"
     >
       {icon} <span>{label}</span>

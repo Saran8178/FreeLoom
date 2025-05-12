@@ -28,6 +28,9 @@ public class AuthFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
+        // Log the incoming authorization header for debugging
+        System.out.println("Authorization Header: " + authHeader);
+
         // Check if the Authorization header is present and starts with "Bearer "
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7); // Get the token from the header
@@ -39,9 +42,16 @@ public class AuthFilter extends OncePerRequestFilter {
                 String role = claims.get("role", String.class);
                 String email = claims.getSubject(); // Extract the email (or username)
 
-                // Create authorities for Spring Security
-                Authentication auth = new UsernamePasswordAuthenticationToken(email, null, 
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)));
+                // Log role and email for debugging
+                System.out.println("Extracted Role: " + role);
+                System.out.println("Extracted Email: " + email);
+
+                // Create authorities for Spring Security (with "ROLE_" prefix for the role)
+                Authentication auth = new UsernamePasswordAuthenticationToken(
+                        email,
+                        null,
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                );
 
                 // Set the authentication in the SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(auth);
