@@ -49,9 +49,12 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                   .requestMatchers("/jobs/all").permitAll()  // Allow public job listing
+                        .requestMatchers("/jobs/**").permitAll() 
                         .requestMatchers("/admin/**").hasRole("OVERALL_ADMIN")
                         .requestMatchers("/recruiter/**").hasRole("RECRUITER")
                         .requestMatchers("/user/**").hasRole("USER")
+             
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new AuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class) // Use the new AuthFilter

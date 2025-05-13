@@ -18,6 +18,15 @@ public class JobService {
     @Autowired
     private UserRepository userRepository;
 
+     // Method to fetch all jobs
+    public List<Job> getAllJobs() {
+        return jobRepository.findAll(); // Fetch all jobs from the database
+    }
+
+        public Job getJobById(Long id) {
+    return jobRepository.findById(id).orElse(null);
+}
+
     public Job addJob(String title, String description, String clientName, User recruiter) {
         Job job = new Job();
         job.setTitle(title);

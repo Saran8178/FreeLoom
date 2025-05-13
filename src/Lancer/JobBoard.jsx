@@ -1,40 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { User, Bookmark, Users, LogOut } from "lucide-react";
 
 const JobBoard = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook for navigation
+  const [jobData, setJobData] = useState([]);
 
-  const [jobData, setJobData] = useState([
-    {
-      id: 1,
-      title: "Frontend Developer",
-      company: "TechNova Inc.",
-      location: "Remote",
-      description: "Build interactive UI components using React and Tailwind CSS.",
-      client: "Balasubramani",
-    },
-    {
-      id: 2,
-      title: "Backend Engineer",
-      company: "CodeWorks",
-      location: "Bangalore, India",
-      description: "Design APIs and manage database logic with Node.js and MongoDB.",
-      client: "",
-    },
-    {
-      id: 3,
-      title: "UI/UX Designer",
-      company: "PixelCraft",
-      location: "New York, USA",
-      description: "Craft intuitive interfaces and user experiences for web apps.",
-      client: "",
-    },
-  ]);
-
+  // Empty dependency array to run only once when component mounts
   useEffect(() => {
-    // Placeholder for backend fetch
+    const fetchJobs = async () => {
+        try {
+            const response = await axios.get("http://localhost:8080/jobs/all", {
+                headers: {} // No authorization header for the public endpoint
+            });
+            setJobData(response.data); // Set job data in state
+        } catch (error) {
+            console.error("Error fetching jobs:", error);
+        }
+    };
+
+    fetchJobs();
   }, []);
+
+  // Handle logout function
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/"); // Redirect to homepage after logout
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
@@ -55,27 +49,34 @@ const JobBoard = () => {
       <div className="flex gap-8 mt-8 max-w-7xl mx-auto px-4">
         {/* Sidebar */}
         <div className="space-y-3 w-full md:w-1/4">
-        <button className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2">
+          <button
+            onClick={() => navigate("/userdashboard")} // Navigate to /userdashboard
+            className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2"
+          >
             <LogOut size={16} /> Dashboard
           </button>
           <button className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2">
             <User size={16} /> User Profile
           </button>
-                      <button
-              className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2"
-              onClick={() => navigate("/savedjob")} // <-- added this
-            >
-              <Bookmark size={16} /> Saved Jobs
-            </button>
+          <button
+            className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2"
+            onClick={() => navigate("/savedjob")}
+          >
+            <Bookmark size={16} /> Saved Jobs
+          </button>
 
-            <button
-              onClick={() => navigate("/clientlist")}
-              className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2"
-            >
-              <Users size={16} /> Manage Client
-            </button>
-            
-          <button className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2">
+          <button
+            onClick={() => navigate("/clientlist")}
+            className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2"
+          >
+            <Users size={16} /> Manage Client
+          </button>
+
+          {/* Logout Button */}
+          <button
+            className="w-full border px-4 py-2 rounded text-left text-black bg-gray-100 flex items-center gap-2"
+            onClick={handleLogout} // Call handleLogout on click
+          >
             <LogOut size={16} /> Logout
           </button>
         </div>

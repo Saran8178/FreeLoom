@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/recruiter/jobs")
 public class JobController {
@@ -21,9 +23,11 @@ public class JobController {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/add")
+    
+    // Existing endpoint to add jobs
+   @PostMapping("/add")
     public ResponseEntity<Job> addJob(@RequestBody JobRequestDTO jobRequestDTO, Authentication authentication) {
-String email = (String) authentication.getPrincipal();
+        String email = (String) authentication.getPrincipal();
 
         User recruiter = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Recruiter not found with email: " + email));
@@ -35,5 +39,12 @@ String email = (String) authentication.getPrincipal();
                 recruiter
         );
         return ResponseEntity.ok(createdJob);
+    }
+
+    // New endpoint to get all jobs
+    @GetMapping("/")
+    public ResponseEntity<List<Job>> getAllJobs() {
+        List<Job> jobs = jobService.getAllJobs();
+        return ResponseEntity.ok(jobs);
     }
 }
