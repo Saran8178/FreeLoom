@@ -56,7 +56,9 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
             Authentication auth = new UsernamePasswordAuthenticationToken(
                     email,
                     null,
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                  Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+
+
             );
 
             // Set the authentication in the SecurityContext

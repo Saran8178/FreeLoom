@@ -51,7 +51,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                    .requestMatchers("/jobs/all").permitAll()  // Allow public job listing
                         .requestMatchers("/jobs/**").permitAll() 
+                       
                         .requestMatchers("/admin/**").hasRole("OVERALL_ADMIN")
+                       .requestMatchers("/job-requests/**").hasRole("USER")
+
                         .requestMatchers("/recruiter/**").hasRole("RECRUITER")
                         .requestMatchers("/user/**").hasRole("USER")
              

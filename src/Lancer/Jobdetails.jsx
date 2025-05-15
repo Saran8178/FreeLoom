@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, User, Bookmark, Users, LogOut } from 'lucide-react';
 import { useSavedJobs } from './SavedJobsContext';
+import { jwtDecode } from 'jwt-decode';
+
+
 import axios from 'axios';
-import { User, Bookmark, Users, LogOut } from 'lucide-react';
 
 const Jobdetails = () => {
   const { id } = useParams();
@@ -17,7 +19,6 @@ const Jobdetails = () => {
   useEffect(() => {
     const fetchJob = async () => {
       const token = localStorage.getItem("token");
-      console.log("Token found:", token);
 
       if (!token) {
         console.error("No token found!");
@@ -54,8 +55,48 @@ const Jobdetails = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     navigate("/");
   };
+
+const handleSendRequest = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("You must be logged in to send a request.");
+    return;
+  }
+
+  let userId;
+  try {
+    const decodedToken = jwtDecode(token);
+    userId = decodedToken.id; // adjust based on your JWT payload structure
+  } catch (err) {
+    console.error("Invalid token format", err);
+    alert("Invalid token. Please log in again.");
+    return;
+  }
+
+  try {
+   await axios.post(
+  "http://localhost:8080/job-requests",
+  { jobId: job.id },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
+
+
+    alert("Job request sent!");
+  } catch (error) {
+    console.error("Error sending job request:", error);
+    alert("Failed to send job request.");
+  }
+};
+
 
   if (loading) {
     return (
@@ -75,7 +116,7 @@ const Jobdetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
-      {/* Top navigation bar */}
+      {/* Top nav */}
       <nav className="flex justify-center gap-6 py-4 text-sm text-gray-700 border-b border-gray-200 overflow-x-auto">
         <span>Graphics & Design</span>
         <span>Programming & Tech</span>
@@ -88,7 +129,6 @@ const Jobdetails = () => {
         <span>AI Services</span>
       </nav>
 
-      {/* Sidebar + Content layout */}
       <div className="flex gap-8 mt-8 max-w-7xl mx-auto px-4">
         {/* Sidebar */}
         <div className="space-y-3 w-full md:w-1/4">
@@ -140,8 +180,8 @@ const Jobdetails = () => {
           </p>
           <p className="text-gray-700 text-base mb-4">{job.description}</p>
 
-          {/* ✅ Send Request button added here */}
           <button
+            onClick={handleSendRequest}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg mb-4"
           >
             Send Request

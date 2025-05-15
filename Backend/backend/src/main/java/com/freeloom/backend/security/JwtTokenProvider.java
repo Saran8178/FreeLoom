@@ -18,15 +18,17 @@ public class JwtTokenProvider {
     private long jwtExpiration;
 
     // Method to generate JWT token
-    public String generateToken(User user) {
-        return Jwts.builder()
-                .setSubject(user.getEmail())
-                  .claim("role", user.getRole().name())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
-    }
+public String generateToken(User user) {
+    return Jwts.builder()
+            .setSubject(user.getEmail())
+            .claim("role", "ROLE_" + user.getRole()) // Correct way to set claims directly
+            .claim("id", user.getId())               // (Optional) include user ID for frontend usage
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+            .signWith(SignatureAlgorithm.HS512, jwtSecret)
+            .compact();
+}
+
 
     // Other utility methods for parsing JWT etc. can be added here
 }
